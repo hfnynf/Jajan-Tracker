@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Jajan Tracker - Landing Page</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif; }
+        
+        body {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #020617, #064e3b, #0f172a);
+            background-attachment: fixed;
+            color: white;
+            overflow-x: hidden;
+        }
+
+        /* Animasi Transisi Halaman */
+        .page {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            animation: fadeIn 0.8s ease forwards;
+        }
+
+        .active { display: flex; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* --- LANDING PAGE STYLES --- */
+        .hero-title {
+            font-size: 3rem;
+            font-weight: 800;
+            letter-spacing: -1px;
+            background: linear-gradient(to bottom, #ffffff, #94a3b8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        .hero-sub {
+            font-size: 1rem;
+            color: rgba(255, 255, 255, 0.6);
+            margin-bottom: 50px;
+            max-width: 250px;
+            line-height: 1.5;
+            text-align: center;
+        }
+
+        .btn-start {
+            padding: 18px 40px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50px;
+            color: white;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .btn-start:hover { background: rgba(255, 255, 255, 0.2); transform: scale(1.05); }
+
+        /* --- MAIN PAGE STYLES --- */
+        .instruction { color: rgba(255,255,255,0.4); font-size: 0.7rem; margin-bottom: 15px; }
+
+        .glass-card {
+            width: 90%; max-width: 380px;
+            padding: 25px;
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 35px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .input-row { display: flex; gap: 8px; margin-bottom: 20px; }
+        input {
+            width: 100%; padding: 14px; border-radius: 15px;
+            border: 1px solid rgba(255,255,255,0.1);
+            background: rgba(0,0,0,0.4); color: white;
+            outline: none; font-size: 0.9rem;
+        }
+
+        .ring-container {
+            position: relative; width: 200px; height: 200px;
+            margin: 0 auto 25px;
+            display: flex; justify-content: center; align-items: center;
+        }
+        svg { transform: rotate(-90deg); position: absolute; }
+        
+        .balance-info { z-index: 10; display: flex; flex-direction: column; align-items: center; }
+        .amount { font-size: 1.6rem; font-weight: 800; color: #ffffff !important; margin-top: 5px; }
+
+        .btn-cut {
+            width: 100%; padding: 15px; background: #059669;
+            border: none; border-radius: 18px; color: white;
+            font-weight: 800; cursor: pointer;
+        }
+
+        .history-card {
+            width: 90%; max-width: 380px; padding: 20px;
+            background: rgba(255,255,255,0.03);
+            border-radius: 25px; border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .history-item {
+            display: flex; justify-content: space-between;
+            padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.05);
+            font-size: 0.85rem;
+        }
+
+        .watermark {
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 0.6rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin: 20px 0;
+        }
+    </style>
+<link rel="manifest" href="manifest.json">
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js');
+  }
+</script>
+
+</head>
+<body>
+
+    <div id="landingPage" class="page active">
+        <h1 class="hero-title">Jajan Tracker</h1>
+        <p class="hero-sub">Kontrol pengeluaran harianmu, amankan tabungan masa depan.</p>
+        <button class="btn-start" onclick="startTracking()">Mulai Tracking</button>
+        <div class="watermark" style="margin-top: 100px;">By: Hifny</div>
+    </div>
+
+    <div id="mainPage" class="page">
+        <div class="instruction">Refresh untuk memulai ulang.</div>
+
+        <div class="glass-card">
+            <div class="input-row">
+                <input type="text" id="budgetInput" placeholder="Set Budget Harian...">
+                <button onclick="initBudget()" style="padding:0 15px; border-radius:12px; border:none; background:#3b82f6; color:white; font-weight:bold;">GO</button>
+            </div>
+
+            <div class="ring-container">
+                <svg width="200" height="200">
+                    <circle stroke="rgba(255,255,255,0.05)" stroke-width="12" fill="transparent" r="85" cx="100" cy="100"/>
+                    <circle id="progress-circle" stroke="#3b82f6" stroke-width="12" fill="transparent" r="85" cx="100" cy="100" style="transition: stroke-dashoffset 0.5s; stroke-linecap: round;"/>
+                </svg>
+                <div class="balance-info">
+                    <span style="font-size:0.65rem; opacity:0.6;">SISA SALDO</span>
+                    <span id="balanceDisplay" class="amount">Rp0</span>
+                </div>
+            </div>
+
+            <div style="display:flex; flex-direction:column; gap:10px; margin-bottom:15px;">
+                <input type="text" id="jajanNote" placeholder="Jajan apa?">
+                <input type="text" id="jajanPrice" placeholder="Harga (Rp)...">
+            </div>
+            <button class="btn-cut" onclick="addManual()">POTONG SALDO</button>
+        </div>
+
+        <div class="history-card">
+            <h3 style="font-size:0.8rem; opacity:0.5; margin-bottom:10px;">HISTORY</h3>
+            <div id="history-list"></div>
+        </div>
+
+        <div class="watermark">By: Hifny</div>
+    </div>
+
+    <script>
+        // --- LOGIKA HALAMAN ---
+        function startTracking() {
+            document.getElementById('landingPage').classList.remove('active');
+            document.getElementById('mainPage').classList.add('active');
+        }
+
+        // --- LOGIKA TRACKER ---
+        const circle = document.getElementById('progress-circle');
+        const circumference = 2 * Math.PI * 85;
+        circle.style.strokeDasharray = circumference;
+        circle.style.strokeDashoffset = circumference;
+
+        let budget = 0;
+        let balance = 0;
+        let history = [];
+
+        function formatRupiah(el) {
+            let val = el.value.replace(/\D/g, "");
+            if (val !== "") {
+                el.value = new Intl.NumberFormat('id-ID').format(val);
+            }
+        }
+
+        document.getElementById('budgetInput').addEventListener('input', function() { formatRupiah(this); });
+        document.getElementById('jajanPrice').addEventListener('input', function() { formatRupiah(this); });
+
+        function cleanNum(str) {
+            return parseInt(str.replace(/\./g, "")) || 0;
+        }
+
+        function updateUI() {
+            document.getElementById('balanceDisplay').innerText = "Rp" + new Intl.NumberFormat('id-ID').format(balance);
+            let pct = budget > 0 ? (balance / budget) : 0;
+            pct = Math.max(0, Math.min(1, pct));
+            circle.style.strokeDashoffset = circumference - (pct * circumference);
+            
+            if (pct > 0.5) circle.style.stroke = "#3b82f6";
+            else if (pct > 0.2) circle.style.stroke = "#10b981";
+            else circle.style.stroke = "#ef4444";
+
+            const list = document.getElementById('history-list');
+            list.innerHTML = history.length === 0 ? '<div style="font-size:0.7rem; opacity:0.3;">Belum ada history</div>' : 
+                history.map(item => `
+                    <div class="history-item">
+                        <span>${item.note}</span>
+                        <span style="color:#f87171; font-weight:700;">-Rp${new Intl.NumberFormat('id-ID').format(item.price)}</span>
+                    </div>
+                `).join('');
+        }
+
+        function initBudget() {
+            let val = cleanNum(document.getElementById('budgetInput').value);
+            if (val <= 0) return;
+            budget = val;
+            balance = val;
+            updateUI();
+            document.getElementById('budgetInput').value = "";
+        }
+
+        function addManual() {
+            let note = document.getElementById('jajanNote').value || "Jajan";
+            let price = cleanNum(document.getElementById('jajanPrice').value);
+            if (price <= 0) return;
+            balance -= price;
+            history.unshift({ note, price });
+            if (history.length > 5) history.pop();
+            updateUI();
+            document.getElementById('jajanNote').value = "";
+            document.getElementById('jajanPrice').value = "";
+        }
+
+        updateUI();
+    </script>
+</body>
+</html>
